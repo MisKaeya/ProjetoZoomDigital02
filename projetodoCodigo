@@ -1,0 +1,76 @@
+// API em assembly para coproessador gráfico. Arquitetura ARM//
+
+//endereço base mapeado na memória para os registradores de ontrole do coprocessador na FPGA
+.equ BASE_ADDR, 0xFF200000
+.equ REG_CMD, 0x00
+// Deslocamento para o registrador de comando 
+.equ REG_FACTOR, 0x04
+// Deslocamento para o registrador de fator de zoom
+
+//códigos da ISA (comandos que o coprocessador deve reconhecer)
+.equ CMD_ZOOM_IN, 0x001
+.equ CMD_ZOOM_OUT, 0x02
+.equ CMD_LOAD_IMAGE, 0x03
+
+// FUNÇÃO 01: zoom_in_asm (fator zoom)
+//R0: fator_zoom (argumento de entrada)
+
+.global zoom_in_asm
+zoom in in asm:
+    //1. enviar o fator de zoom para o registrador de fator (REG_FACTOR)
+    LDS R1, = BASE BASE_ADDRSRT R0, [R1, #REG_FACTOR]  // Armazena fator_zoom (R0) no endereço BASE_ADDR + REG_FACTOR
+    
+    //2. Enviar o comando de zoom in (CMD_ZOOM_IN) Para o registrador de comando (REG_CMD)
+        MOV R2, #CMD_ZOOM_IN
+        // R2 = CMD_ZOOM_IN
+        STR R2, [R1, #REG_CMD]
+        //Armazena o comando (R2) no endereço BASE_ADDR + REG_CMD
+
+    //3. Aguardar a conclusão (implementação de polling/sincronização omitida por brevidade)
+
+    //4. Retorno (retorn 0 para idicar sucesso)
+        MOV R0, #0
+        BX LR
+    .end
+
+// FUNÇÃO 02: zoom_out_asm (fator_zoom)
+RO: fator_zoom (argumento de entrada)
+.global zoom_out_asmzoom_out_asm:
+    // 1. Enviar o fator de zoom para o registrador de fator (REG_FACTOR)
+        LDR R1, +BASE_ADDRSTR R0, [R1 #REG_FACTOR] 
+        //Armazena fator_zoom (R0) no endereço BASE_ADDR + REG_FACTOR
+    
+    //2. Enviar o comando de zoom out (CMD_ZOOM_OUT) para o registrador de comando (REG_CMD)
+        MOV R2, #CMD_ZOOM_OUT
+        // R2 = CMD_ZOOM_OUT
+        STR R2, [R1, #REG_CMD}
+        // Armazena o comando (R2) no endereço BASE_ADDR + REG_CMD 
+
+    //3. Aguardar a conclusão (implementação de polling/ sincronização omitida por brevidade)
+
+    //4. Retorno
+        MOV R0, #0
+        BX LR
+    .end
+
+// FUNÇAÕ 03: load_image_asm (src_addr, width, height)
+// R0: src_addr (ponteiro para dados da imagem no hps)
+// R1: width
+// R2: height
+// suposto uso de um bufeer FIFO para transferencia dos dados da matriz pixel a pixel
+.global load_image_asmload_image_asm:
+    // Exemplo: simplesmente envia o endereço de origem e o comando, assumindo que o coprocessador iniciaraá a trasnferencia DMA (se suportado) ou o assembly faria um lool de leitura e escrita (transferencia I/O)
+    //1.  Configurar o endereço de origem e dimensões (asumindo registradores para isso)
+        //lógica para configurar DMA ou loop de transferencia complexa Arquitetura
+    
+    //2. Enviar o comando de carregamento para iniciar a transferncia (se houver buffer FIFO/DMA)
+        LDR R3, =BASE_ADDR
+        MOV R4, #CMD_LOAD_IMAGE
+        STR R4, [R3, #REG_CMD]
+
+    //3. Aguardar a conslusão da transferencia (implementação do polling/ sincronização)
+
+    //4. Retorno
+    MOV R0, #0
+    BX LR
+.end
